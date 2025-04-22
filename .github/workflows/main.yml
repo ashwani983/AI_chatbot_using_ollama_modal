@@ -20,10 +20,6 @@ jobs:
     - name: connect and pull
       run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git checkout ${{ secrets.MAIN_BRANCH }} && git pull && exit"
     - name: Restart Flask server
-      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
-        cd ${{ secrets.WORK_DIR }} && \
-        fuser -k 8000/tcp || true && \
-        . env/bin/activate && \
-        nohup flask run --host=0.0.0.0 --port=8000 > flask.log 2>&1 & "
+      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && fuser -k 8000/tcp || true && source ./env/bin/activate && nohup flask run --host=0.0.0.0 --port=8000 > flask.log 2>&1 &"
     - name: cleanup
       run: rm -rf ~/.ssh
