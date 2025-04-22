@@ -18,6 +18,13 @@ jobs:
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
     - name: connect and pull
-      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git checkout ${{ secrets.MAIN_BRANCH }} && git pull && touch hello_from_git.sh && exit"
+      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git checkout ${{ secrets.MAIN_BRANCH }} && git pull && exit"
+    - name: Restart Flask server
+      run: | 
+        ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 
+        cd ${{ secrets.WORK_DIR }}
+        fuser -k 8000/tcp || true
+        source env/bin/activate
+        nohup flask run --host=0.0.0.0 --port=8000 > flask.log 2>&1 &
     - name: cleanup
       run: rm -rf ~/.ssh
